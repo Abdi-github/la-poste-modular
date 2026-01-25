@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{reports.title}">Reports</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4"><i class="bi bi-file-earmark-bar-graph me-2"></i><span th:text="#{reports.title}">Reports & Export</span></h4>
+
+  <div class="row g-4">
+    <div class="col-md-6 col-xl-3" th:each="entity : ${ {'parcels','employees','customers','branches'} }">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="bi display-4 mb-3"
+             th:classappend="${entity == 'parcels' ? 'bi-box-seam text-primary' : entity == 'employees' ? 'bi-people text-info' : entity == 'customers' ? 'bi-person-lines-fill text-success' : 'bi-building text-warning'}"></i>
+          <h5 th:text="${#strings.capitalize(entity)}">Entity</h5>
+          <p class="text-muted small" th:text="#{reports.export_hint}">Download data as CSV</p>
+          <a th:href="@{'/admin/reports/' + ${entity} + '/csv'}" class="btn btn-outline-primary">
+            <i class="bi bi-download me-1"></i>CSV
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

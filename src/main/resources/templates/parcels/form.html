@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{parcels.new}">New Parcel</title></head>
+<body>
+<section layout:fragment="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0" th:text="#{parcels.new}">New Parcel</h4>
+    <a th:href="@{/parcels}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><span th:text="#{common.back}">Back</span></a>
+  </div>
+
+  <form th:action="@{/parcels}" method="post" th:object="${parcel}">
+    <div class="row g-4">
+      <!-- ── Parcel Details ── -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header"><h6 class="mb-0" th:text="#{parcels.detail}">Parcel Details</h6></div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="type" class="form-label" th:text="#{parcels.type}">Type</label>
+              <select class="form-select" id="type" th:field="*{type}">
+                <option th:each="t : ${parcelTypes}" th:value="${t}" th:text="${t}">TYPE</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="weightKg" class="form-label" th:text="#{parcels.weight}">Weight (kg)</label>
+              <input type="number" class="form-control" id="weightKg" th:field="*{weightKg}" step="0.01" min="0.01" required/>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-4">
+                <label for="lengthCm" class="form-label">L (cm)</label>
+                <input type="number" class="form-control" id="lengthCm" th:field="*{lengthCm}" step="0.1"/>
+              </div>
+              <div class="col-4">
+                <label for="widthCm" class="form-label">W (cm)</label>
+                <input type="number" class="form-control" id="widthCm" th:field="*{widthCm}" step="0.1"/>
+              </div>
+              <div class="col-4">
+                <label for="heightCm" class="form-label">H (cm)</label>
+                <input type="number" class="form-control" id="heightCm" th:field="*{heightCm}" step="0.1"/>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="originBranchId" class="form-label" th:text="#{parcels.origin_branch}">Origin Branch</label>
+              <select class="form-select" id="originBranchId" th:field="*{originBranchId}">
+                <option value="">—</option>
+                <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.branchCode + ' – ' + b.name}">Branch</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="senderCustomerId" class="form-label" th:text="#{parcels.sender_customer}">Sender Customer</label>
+              <select class="form-select" id="senderCustomerId" th:field="*{senderCustomerId}">
+                <option value="">—</option>
+                <option th:each="c : ${customers}" th:value="${c.id}" th:text="${c.customerNumber + ' – ' + c.firstName + ' ' + c.lastName}">Customer</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Sender & Recipient ── -->
+      <div class="col-lg-6">
+        <div class="card mb-4">
+          <div class="card-header"><h6 class="mb-0" th:text="#{parcels.sender_info}">Sender Information</h6></div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="senderName" class="form-label" th:text="#{parcels.sender}">Sender Name</label>
+              <input type="text" class="form-control" id="senderName" th:field="*{senderName}" required/>
+            </div>
+            <div class="mb-3">
+              <label for="senderStreet" class="form-label" th:text="#{branches.street}">Street</label>
+              <input type="text" class="form-control" id="senderStreet" th:field="*{senderStreet}"/>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-4">
+                <label for="senderZipCode" class="form-label" th:text="#{branches.zip}">ZIP</label>
+                <input type="text" class="form-control" id="senderZipCode" th:field="*{senderZipCode}"/>
+              </div>
+              <div class="col-8">
+                <label for="senderCity" class="form-label" th:text="#{branches.city}">City</label>
+                <input type="text" class="form-control" id="senderCity" th:field="*{senderCity}"/>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="senderPhone" class="form-label" th:text="#{common.phone}">Phone</label>
+              <input type="text" class="form-control" id="senderPhone" th:field="*{senderPhone}"/>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h6 class="mb-0" th:text="#{parcels.recipient_info}">Recipient Information</h6></div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="recipientName" class="form-label" th:text="#{parcels.recipient}">Recipient Name</label>
+              <input type="text" class="form-control" id="recipientName" th:field="*{recipientName}" required/>
+            </div>
+            <div class="mb-3">
+              <label for="recipientStreet" class="form-label" th:text="#{branches.street}">Street</label>
+              <input type="text" class="form-control" id="recipientStreet" th:field="*{recipientStreet}" required/>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-4">
+                <label for="recipientZipCode" class="form-label" th:text="#{branches.zip}">ZIP</label>
+                <input type="text" class="form-control" id="recipientZipCode" th:field="*{recipientZipCode}" required/>
+              </div>
+              <div class="col-8">
+                <label for="recipientCity" class="form-label" th:text="#{branches.city}">City</label>
+                <input type="text" class="form-control" id="recipientCity" th:field="*{recipientCity}" required/>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="recipientPhone" class="form-label" th:text="#{common.phone}">Phone</label>
+              <input type="text" class="form-control" id="recipientPhone" th:field="*{recipientPhone}"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-end mt-4">
+      <button type="submit" class="btn btn-warning btn-lg"><i class="bi bi-check-lg me-1"></i><span th:text="#{common.save}">Save</span></button>
+    </div>
+  </form>
+</section>
+</body>
+</html>
+

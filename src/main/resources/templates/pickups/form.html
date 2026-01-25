@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{pickups.new}">New Pickup Request</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4" th:text="#{pickups.new}">New Pickup Request</h4>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form th:action="@{/pickups}" method="post">
+        <div class="row g-3">
+          <!-- Customer -->
+          <div class="col-md-6">
+            <label class="form-label" th:text="#{pickups.customer}">Customer</label>
+            <select name="customerId" class="form-select" required>
+              <option value="" th:text="'— ' + #{common.search} + ' —'">— Select —</option>
+              <option th:each="c : ${customers}" th:value="${c.id}"
+                      th:text="${c.customerNumber + ' – ' + c.firstName + ' ' + c.lastName}"></option>
+            </select>
+          </div>
+
+          <!-- Preferred Date -->
+          <div class="col-md-6">
+            <label class="form-label" th:text="#{pickups.preferred_date}">Preferred Date</label>
+            <input type="date" name="preferredDate" class="form-control" required />
+          </div>
+
+          <!-- Street -->
+          <div class="col-md-12">
+            <label class="form-label" th:text="#{pickups.street}">Street</label>
+            <input type="text" name="pickupStreet" class="form-control" required
+                   th:placeholder="#{pickups.street}" />
+          </div>
+
+          <!-- ZIP + City -->
+          <div class="col-md-4">
+            <label class="form-label" th:text="#{addresses.zip}">ZIP</label>
+            <input type="text" name="pickupZipCode" class="form-control" required maxlength="10" />
+          </div>
+          <div class="col-md-8">
+            <label class="form-label" th:text="#{addresses.city}">City</label>
+            <input type="text" name="pickupCity" class="form-control" required />
+          </div>
+
+          <!-- Time window -->
+          <div class="col-md-6">
+            <label class="form-label" th:text="#{pickups.time_from}">From</label>
+            <input type="time" name="preferredTimeFrom" class="form-control" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" th:text="#{pickups.time_to}">To</label>
+            <input type="time" name="preferredTimeTo" class="form-control" />
+          </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i><span th:text="#{common.create}">Create</span>
+          </button>
+          <a th:href="@{/pickups}" class="btn btn-outline-secondary" th:text="#{common.cancel}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

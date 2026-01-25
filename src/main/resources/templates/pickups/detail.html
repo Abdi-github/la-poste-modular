@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{pickups.detail}">Pickup Details</title></head>
+<body>
+<section layout:fragment="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">
+      <span th:text="#{pickups.detail}">Pickup Request</span>
+      <span class="text-muted">#<span th:text="${pickup.id}">1</span></span>
+    </h4>
+    <a th:href="@{/pickups}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i><span th:text="#{common.back}">Back</span>
+    </a>
+  </div>
+
+  <div class="row g-4">
+    <!-- ── Pickup Info Card ────────────────── -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="bi bi-box-arrow-up me-2"></i><span th:text="#{pickups.detail}">Pickup Details</span></h6>
+        </div>
+        <div class="card-body">
+          <table class="table table-borderless mb-0">
+            <tr>
+              <th class="text-muted" style="width:40%;" th:text="#{pickups.customer}">Customer</th>
+              <td>
+                <span th:if="${customerName}" th:text="${customerName}">—</span>
+                <span class="text-muted ms-1">(#<span th:text="${pickup.customerId}">1</span>)</span>
+              </td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{pickups.address}">Address</th>
+              <td th:text="${pickup.pickupStreet + ', ' + pickup.pickupZipCode + ' ' + pickup.pickupCity}">—</td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{pickups.preferred_date}">Preferred Date</th>
+              <td th:text="${pickup.preferredDate}">—</td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{pickups.time_window}">Time Window</th>
+              <td>
+                <span th:if="${pickup.preferredTimeFrom}" th:text="${pickup.preferredTimeFrom + ' – ' + (pickup.preferredTimeTo ?: '?')}">—</span>
+                <span th:unless="${pickup.preferredTimeFrom}" class="text-muted">Not specified</span>
+              </td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{common.status}">Status</th>
+              <td>
+                <span class="badge"
+                      th:classappend="${pickup.status.name() == 'PICKED_UP' ? 'bg-success' : pickup.status.name() == 'CANCELLED' ? 'bg-danger' : pickup.status.name() == 'PENDING' ? 'bg-warning text-dark' : 'bg-info'}"
+                      th:text="${pickup.status}">—</span>
+              </td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{parcels.created}">Created</th>
+              <td th:text="${#temporals.format(pickup.createdAt, 'dd.MM.yyyy HH:mm')}">—</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Status Actions Card ─────────────── -->
+    <div class="col-md-6" th:if="${#arrays.length(nextStatuses) > 0}">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="bi bi-arrow-repeat me-2"></i><span th:text="#{employees.status_change}">Change Status</span></h6>
+        </div>
+        <div class="card-body">
+          <form th:action="@{'/pickups/' + ${pickup.id} + '/status'}" method="post" class="d-flex gap-2 flex-wrap">
+            <th:block th:each="ns : ${nextStatuses}">
+              <button type="submit" name="newStatus" th:value="${ns}"
+                      class="btn"
+                      th:classappend="${ns.name() == 'CANCELLED' ? 'btn-outline-danger' : 'btn-outline-primary'}"
+                      th:text="${ns}">STATUS</button>
+            </th:block>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

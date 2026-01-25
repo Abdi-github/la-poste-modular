@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="${editMode} ? #{employees.edit} : #{employees.new}">Employee Form</title></head>
+<body>
+<section layout:fragment="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0" th:text="${editMode} ? #{employees.edit} : #{employees.new}">Employee Form</h4>
+    <a th:href="@{/employees}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><span th:text="#{common.back}">Back</span></a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form th:action="${editMode} ? @{/employees/{id}/edit(id=${employeeId})} : @{/employees}" method="post" th:object="${employee}">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="firstName" class="form-label" th:text="#{employees.name}">First Name</label>
+            <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required/>
+          </div>
+          <div class="col-md-6">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required/>
+          </div>
+          <div class="col-md-6">
+            <label for="email" class="form-label" th:text="#{common.email}">Email</label>
+            <input type="email" class="form-control" id="email" th:field="*{email}" required/>
+          </div>
+          <div class="col-md-6">
+            <label for="phone" class="form-label" th:text="#{common.phone}">Phone</label>
+            <input type="text" class="form-control" id="phone" th:field="*{phone}"/>
+          </div>
+          <div class="col-md-6">
+            <label for="role" class="form-label" th:text="#{employees.role}">Role</label>
+            <select class="form-select" id="role" th:field="*{role}">
+              <option th:each="r : ${roles}" th:value="${r}" th:text="${r}">ROLE</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="assignedBranchId" class="form-label" th:text="#{employees.branch}">Branch</label>
+            <select class="form-select" id="assignedBranchId" th:field="*{assignedBranchId}">
+              <option value="">—</option>
+              <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.branchCode + ' – ' + b.name}">Branch</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="hireDate" class="form-label" th:text="#{employees.hire_date}">Hire Date</label>
+            <input type="date" class="form-control" id="hireDate" th:field="*{hireDate}" required/>
+          </div>
+          <div class="col-md-6">
+            <label for="preferredLocale" class="form-label" th:text="#{employees.locale}">Language</label>
+            <select class="form-select" id="preferredLocale" th:field="*{preferredLocale}">
+              <option value="de">Deutsch</option>
+              <option value="fr">Français</option>
+              <option value="it">Italiano</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-warning btn-lg"><i class="bi bi-check-lg me-1"></i><span th:text="#{common.save}">Save</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

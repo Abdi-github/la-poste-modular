@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{branches.detail}">Branch Details</title></head>
+<body>
+<section layout:fragment="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0" th:text="#{branches.detail}">Branch Details</h4>
+    <a th:href="@{/branches}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><span th:text="#{common.back}">Back</span></a>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h6 class="mb-0"><code th:text="${branch.branchCode}">BR-XXX</code></h6>
+      <span class="badge" th:classappend="'badge-' + ${branch.status}" th:text="${branch.status}">STATUS</span>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label text-muted small" th:text="#{branches.name}">Name</label>
+          <div th:text="${branch.name}">Branch Name</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted small" th:text="#{branches.type}">Type</label>
+          <div><span class="badge bg-secondary" th:text="${branch.type}">TYPE</span></div>
+        </div>
+        <div class="col-12" th:if="${branch.description}">
+          <label class="form-label text-muted small">Description</label>
+          <div th:text="${branch.description}">-</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted small" th:text="#{common.address}">Address</label>
+          <div>
+            <div th:text="${branch.street}">Street</div>
+            <div><span th:text="${branch.zipCode}">1000</span> <span th:text="${branch.city}">City</span></div>
+            <div th:if="${branch.canton}" th:text="${branch.canton}">ZH</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted small">Contact</label>
+          <div>
+            <div th:if="${branch.phone}"><i class="bi bi-telephone me-1"></i><span th:text="${branch.phone}">Phone</span></div>
+            <div th:if="${branch.email}"><i class="bi bi-envelope me-1"></i><span th:text="${branch.email}">Email</span></div>
+          </div>
+        </div>
+        <div class="col-md-6" th:if="${branch.latitude != null}">
+          <label class="form-label text-muted small" th:text="#{branches.coordinates}">Coordinates</label>
+          <div th:text="${branch.latitude + ', ' + branch.longitude}">0, 0</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted small" th:text="#{parcels.created}">Created</label>
+          <div th:text="${branch.createdAt != null} ? ${#temporals.format(branch.createdAt, 'dd.MM.yyyy HH:mm')} : '-'">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

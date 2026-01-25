@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{notifications.inbox}">Inbox</title></head>
+<body>
+<section layout:fragment="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">
+      <i class="bi bi-bell me-2"></i><span th:text="#{notifications.inbox}">Notification Inbox</span>
+      <span class="badge bg-primary ms-2" th:if="${unreadCount > 0}" th:text="${unreadCount + ' unread'}">0</span>
+    </h4>
+    <form th:action="@{/notifications/mark-all-read/{id}(id=${employeeId})}" method="post" th:if="${unreadCount > 0}">
+      <button type="submit" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-check2-all me-1"></i><span th:text="#{notifications.mark_all_read}">Mark all read</span>
+      </button>
+    </form>
+  </div>
+
+  <div class="row g-3">
+    <div th:each="n : ${page.content}" class="col-12">
+      <div class="card" th:classappend="${!n.read} ? 'border-start border-4 border-primary'">
+        <div class="card-body py-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi fs-5" th:classappend="${n.category.name() == 'URGENT'} ? 'bi-exclamation-triangle-fill text-danger'
+                  : (${n.category.name() == 'WARNING'} ? 'bi-exclamation-circle-fill text-warning'
+                  : (${n.category.name() == 'SYSTEM'} ? 'bi-gear-fill text-secondary'
+                  : 'bi-info-circle-fill text-primary'))"></i>
+              <h6 class="mb-0" th:text="${n.title}">Title</h6>
+              <span class="badge" th:classappend="'badge-category-' + ${n.category}" th:text="${n.category}">INFO</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <small class="text-muted" th:text="${#temporals.format(n.createdAt, 'dd.MM.yyyy HH:mm')}">Date</small>
+              <form th:if="${!n.read}" th:action="@{/notifications/read/{nid}/{eid}(nid=${n.id}, eid=${employeeId})}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-outline-primary" title="Mark as read">
+                  <i class="bi bi-check2"></i>
+                </button>
+              </form>
+              <span th:if="${n.read}" class="text-success"><i class="bi bi-check2-circle"></i></span>
+            </div>
+          </div>
+          <p class="mt-2 mb-1" th:text="${n.message}">Message body</p>
+          <div class="d-flex gap-3 mt-2">
+            <small class="text-muted" th:if="${n.senderName != null}">
+              <i class="bi bi-person me-1"></i><span th:text="${n.senderName}">Sender</span>
+            </small>
+            <small class="text-muted" th:if="${n.senderName == null}">
+              <i class="bi bi-robot me-1"></i>System
+            </small>
+            <small class="text-muted" th:if="${n.targetRole != null}">
+              <i class="bi bi-people me-1"></i><span th:text="${n.targetRole}">Role</span>
+            </small>
+            <a th:if="${n.referenceUrl != null}" th:href="${n.referenceUrl}" class="small">
+              <i class="bi bi-link-45deg me-1"></i><span th:text="#{common.details}">Details</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(page.content)}" class="col-12">
+      <div class="card">
+        <div class="card-body text-center text-muted py-5">
+          <i class="bi bi-bell-slash fs-1 d-block mb-2"></i>
+          <p th:text="#{common.no_results}">No notifications</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-3" th:replace="~{fragments/pagination :: pagination(${page})}"></div>
+</section>
+</body>
+</html>
+

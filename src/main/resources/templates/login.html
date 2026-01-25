@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Login – La Poste</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css}"/>
+  <style>
+    body { background: #1a1a2e; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .login-card { max-width: 400px; width: 100%; border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .login-header { background: #ffcc00; color: #1a1a2e; text-align: center; padding: 2rem 1rem 1rem; border-radius: 1rem 1rem 0 0; }
+  </style>
+</head>
+<body>
+  <div class="card login-card">
+    <div class="login-header">
+      <div style="font-size: 3rem;">📮</div>
+      <h4 class="fw-bold mt-2 mb-0">La Poste</h4>
+      <small>Swiss Postal Service Platform</small>
+    </div>
+    <div class="card-body p-4">
+      <div class="alert alert-danger" th:if="${param.error}">Authentication failed. Please try again.</div>
+      <div class="alert alert-success" th:if="${param.logout}">You have been logged out.</div>
+
+      <!-- OAuth2 Login — redirects to Keycloak -->
+      <a th:href="@{/oauth2/authorization/keycloak}"
+         class="btn w-100 fw-bold d-flex align-items-center justify-content-center gap-2"
+         style="background:#ffcc00; color:#1a1a2e;">
+        <i class="bi bi-shield-lock"></i> Sign in with Keycloak
+      </a>
+
+      <div class="text-center mt-3">
+        <small class="text-muted">You will be redirected to the identity provider</small>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+

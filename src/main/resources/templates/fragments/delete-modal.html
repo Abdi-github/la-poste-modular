@@ -1,0 +1,29 @@
+<!-- Reusable delete confirmation modal — use with: th:replace="~{fragments/delete-modal :: deleteModal('Entity', '/path/to/delete')}" -->
+<div xmlns:th="http://www.thymeleaf.org">
+  <div th:fragment="deleteModal(entityName, deleteUrl)" class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" th:text="#{common.confirm}">Confirm</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            <span th:text="#{common.delete_confirm}">Are you sure you want to delete this</span>
+            <strong th:text="${entityName}">item</strong>?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                  th:text="#{common.cancel}">Cancel</button>
+          <form th:action="${deleteUrl}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-danger">
+              <i class="bi bi-trash me-1"></i><span th:text="#{common.delete}">Delete</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

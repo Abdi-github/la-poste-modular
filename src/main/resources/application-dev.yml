@@ -1,0 +1,19 @@
+# ── Dev Profile Overrides ─────────────────────────
+spring:
+  thymeleaf:
+    cache: false
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+logging:
+  level:
+    ch.swiftapp.laposte: DEBUG
+    org.hibernate.SQL: DEBUG
+
+
+app:
+  scheduler:
+    enabled: true

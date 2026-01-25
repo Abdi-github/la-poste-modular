@@ -1,0 +1,12 @@
+<!-- ── Alert Fragments ── -->
+<div th:fragment="alerts">
+  <div class="alert alert-success alert-dismissible fade show" role="alert"
+       th:if="${successMessage}" th:text="${successMessage}">
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert"
+       th:if="${errorMessage}" th:text="${errorMessage}">
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+</div>
+

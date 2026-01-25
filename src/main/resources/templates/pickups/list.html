@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{pickups.title}">Pickup Requests</title></head>
+<body>
+<section layout:fragment="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0" th:text="#{pickups.title}">Pickup Requests</h4>
+    <a th:href="@{/pickups/new}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i><span th:text="#{pickups.new}">New Pickup</span>
+    </a>
+  </div>
+
+  <!-- ── Filter ──────────────────────────────── -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <form th:action="@{/pickups}" method="get" class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label" th:text="#{common.status}">Status</label>
+          <select name="status" class="form-select">
+            <option value="" th:text="'— ' + #{notifications.compose_all} + ' —'">— All —</option>
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${s == selectedStatus}"></option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-funnel me-1"></i><span th:text="#{common.search}">Filter</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Table ───────────────────────────────── -->
+  <div class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th th:text="#{pickups.customer}">Customer</th>
+          <th th:text="#{pickups.address}">Address</th>
+          <th th:text="#{pickups.preferred_date}">Date</th>
+          <th th:text="#{pickups.time_window}">Time</th>
+          <th th:text="#{common.status}">Status</th>
+          <th th:text="#{common.actions}">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${page.content}">
+          <td th:text="${p.id}">1</td>
+          <td th:text="'#' + ${p.customerId}">—</td>
+          <td th:text="${p.pickupStreet + ', ' + p.pickupZipCode + ' ' + p.pickupCity}">—</td>
+          <td th:text="${p.preferredDate}">—</td>
+          <td>
+            <span th:if="${p.preferredTimeFrom}" th:text="${p.preferredTimeFrom + ' – ' + (p.preferredTimeTo ?: '?')}">—</span>
+            <span th:unless="${p.preferredTimeFrom}" class="text-muted">—</span>
+          </td>
+          <td>
+            <span class="badge"
+                  th:classappend="${p.status.name() == 'PICKED_UP' ? 'bg-success' : p.status.name() == 'CANCELLED' ? 'bg-danger' : p.status.name() == 'PENDING' ? 'bg-warning text-dark' : 'bg-info'}"
+                  th:text="${p.status}">—</span>
+          </td>
+          <td>
+            <a th:href="@{'/pickups/' + ${p.id}}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        <tr th:if="${page.content.isEmpty()}">
+          <td colspan="7" class="text-center text-muted py-4" th:text="#{common.no_results}">No results found</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer" th:if="${page.totalPages > 1}">
+      <div th:replace="~{fragments/pagination :: pagination(${page})}"></div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

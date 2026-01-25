@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{deliveries.title}">Deliveries</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4" th:text="#{deliveries.title}">Delivery Management</h4>
+
+  <!-- ── Filter Bar ──────────────────────────── -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body py-2">
+      <form th:action="@{/deliveries}" method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small mb-1" th:text="#{common.search}">Search</label>
+          <input type="text" class="form-control form-control-sm" name="search" th:value="${search}"
+                 th:placeholder="#{deliveries.route_code} + '...'"/>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small mb-1" th:text="#{common.status}">Status</label>
+          <select name="status" class="form-select form-select-sm">
+            <option value="" th:text="'— ' + #{notifications.compose_all} + ' —'">— All —</option>
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${s == selectedStatus}"></option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small mb-1" th:text="#{common.date}">Date</label>
+          <input type="date" class="form-control form-control-sm" name="date" th:value="${selectedDate}"/>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-funnel me-1"></i><span th:text="#{common.search}">Filter</span>
+          </button>
+          <a th:href="@{/deliveries}" class="btn btn-outline-secondary btn-sm" title="Reset">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Table ───────────────────────────────── -->
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th th:replace="~{fragments/table-tools :: sortTh('routeCode', #{deliveries.route_code})}">Route Code</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('status', #{common.status})}">Status</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('date', #{common.date})}">Date</th>
+              <th th:text="#{deliveries.slots}">Stops</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="r : ${page.content}">
+              <td><code th:text="${r.routeCode}">RT-XXXXX</code></td>
+              <td><span class="badge" th:classappend="'badge-' + ${r.status}" th:text="${r.status}">PLANNED</span></td>
+              <td th:text="${r.date}">2026-01-01</td>
+              <td th:text="${r.slots != null ? r.slots.size() : 0}">0</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(page.content)}">
+              <td colspan="4" class="text-center text-muted py-3" th:text="#{common.no_results}">No results</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-footer" th:replace="~{fragments/pagination :: pagination(${page})}"></div>
+  </div>
+</section>
+</body>
+</html>

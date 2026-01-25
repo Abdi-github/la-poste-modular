@@ -1,0 +1,119 @@
+/* ══════════════════════════════════════════════════════
+   La Poste Modular — Custom CSS
+   ══════════════════════════════════════════════════════ */
+
+:root {
+  --lp-yellow: #ffcc00;
+  --lp-red: #e30613;
+  --lp-dark: #1a1a2e;
+  --lp-sidebar-width: 260px;
+  --lp-topbar-height: 56px;
+}
+
+/* ── Topbar ─────────────────────────────────────────── */
+.lp-topbar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--lp-topbar-height);
+  background: var(--lp-dark);
+  color: #fff;
+  display: flex; align-items: center;
+  padding: 0 1rem;
+  z-index: 1040;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.lp-topbar .brand-icon { font-size: 1.5rem; }
+.lp-topbar .brand-name { font-weight: 600; color: var(--lp-yellow); }
+.lp-topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+.lp-topbar-icon-btn {
+  background: none; border: none; color: #ccc; font-size: 1.2rem;
+  cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 0.375rem;
+}
+.lp-topbar-icon-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+/* ── Sidebar ────────────────────────────────────────── */
+.lp-sidebar {
+  position: fixed; top: var(--lp-topbar-height); left: 0; bottom: 0;
+  width: var(--lp-sidebar-width);
+  background: #fff;
+  border-right: 1px solid #e9ecef;
+  overflow-y: auto;
+  z-index: 1030;
+  transition: transform 0.3s ease;
+}
+.lp-sidebar .nav-link {
+  color: #495057; padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.75rem;
+  font-size: 0.9rem; border-radius: 0;
+}
+.lp-sidebar .nav-link:hover { background: #f8f9fa; color: var(--lp-dark); }
+.lp-sidebar .nav-link.active { background: #fff3cd; color: var(--lp-dark); font-weight: 600; border-left: 3px solid var(--lp-yellow); }
+.lp-sidebar .nav-link i { font-size: 1.1rem; width: 1.5rem; text-align: center; }
+
+/* ── Main Content ───────────────────────────────────── */
+.lp-main {
+  margin-left: var(--lp-sidebar-width);
+  margin-top: var(--lp-topbar-height);
+  padding: 1.5rem;
+  min-height: calc(100vh - var(--lp-topbar-height));
+  background: #f8f9fa;
+}
+
+/* ── Stat Cards ─────────────────────────────────────── */
+.stat-card { border: none; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.stat-card .card-body { padding: 1.25rem; }
+.stat-card .stat-value { font-size: 2rem; font-weight: 700; }
+.stat-card .stat-label { font-size: 0.85rem; color: #6c757d; }
+.stat-card .stat-icon { font-size: 2.5rem; opacity: 0.15; }
+
+/* ── Status Badges ──────────────────────────────────── */
+.badge-ACTIVE, .badge-DELIVERED, .badge-COMPLETED, .badge-SENT { background-color: #198754 !important; }
+.badge-CREATED, .badge-PLANNED, .badge-PENDING { background-color: #0d6efd !important; }
+.badge-IN_TRANSIT, .badge-IN_PROGRESS, .badge-OUT_FOR_DELIVERY { background-color: #ffc107 !important; color: #000 !important; }
+.badge-CANCELLED, .badge-FAILED, .badge-TERMINATED { background-color: #dc3545 !important; }
+.badge-ON_LEAVE, .badge-RETURNED, .badge-RETRYING { background-color: #6c757d !important; }
+.badge-INACTIVE, .badge-SUSPENDED { background-color: #6c757d !important; }
+
+/* ── Timeline ───────────────────────────────────────── */
+.timeline { position: relative; padding-left: 2rem; }
+.timeline::before { content: ''; position: absolute; left: 0.75rem; top: 0; bottom: 0; width: 2px; background: #dee2e6; }
+.timeline-item { position: relative; padding-bottom: 1.5rem; }
+.timeline-item::before {
+  content: ''; position: absolute; left: -1.6rem; top: 0.25rem;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--lp-yellow); border: 2px solid var(--lp-dark);
+}
+.timeline-item:last-child { padding-bottom: 0; }
+
+/* ── Sidebar Backdrop (mobile) ──────────────────────── */
+.sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1025; }
+
+/* ── Notification Bell ──────────────────────────────── */
+.notification-badge {
+  position: absolute; top: -2px; right: -2px;
+  min-width: 18px; height: 18px;
+  background: var(--lp-red); color: #fff;
+  font-size: 0.65rem; font-weight: 700;
+  border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  line-height: 1; padding: 0 4px;
+}
+.notification-dropdown { max-height: 450px; overflow-y: auto; }
+.notification-unread { background: #f0f7ff; }
+.notification-item:hover { background: #f8f9fa; }
+
+/* ── Sortable Table Headers ─────────────────────────── */
+.sortable-header { white-space: nowrap; }
+.sortable-header .sort-link { cursor: pointer; user-select: none; }
+.sortable-header .sort-link:hover { color: var(--lp-dark) !important; }
+.sortable-header .sort-link:hover .sort-indicator .bi { opacity: 1 !important; color: var(--lp-dark) !important; }
+.sort-indicator { display: inline-flex; align-items: center; }
+
+/* ── Filter Bar ─────────────────────────────────────── */
+.card.shadow-sm .form-label { font-weight: 500; }
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 991.98px) {
+  .lp-sidebar { transform: translateX(-100%); }
+  .lp-sidebar.show { transform: translateX(0); }
+  .lp-main { margin-left: 0; }
+  .sidebar-backdrop.show { display: block; }
+}

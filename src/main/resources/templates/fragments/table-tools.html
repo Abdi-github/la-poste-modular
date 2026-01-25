@@ -1,0 +1,19 @@
+<!-- ── Sortable Column Header Fragment ── -->
+<!--
+  Usage: <th th:replace="~{fragments/table-tools :: sortTh('fieldName', 'Label')}">Column</th>
+-->
+<th th:fragment="sortTh(field, label)" class="sortable-header">
+  <a href="#" class="text-decoration-none text-dark d-flex align-items-center gap-1 sort-link"
+     th:data-field="${field}" onclick="toggleSort(this); return false;">
+    <span th:text="${label}">Column</span>
+    <span class="sort-indicator"
+          th:with="currentSort=${param.sort != null ? param.sort[0] : ''}">
+      <i th:if="${#strings.contains(currentSort, field + ',asc') or #strings.contains(currentSort, field + ',ASC')}"
+         class="bi bi-sort-up text-primary"></i>
+      <i th:if="${#strings.contains(currentSort, field + ',desc') or #strings.contains(currentSort, field + ',DESC')}"
+         class="bi bi-sort-down text-primary"></i>
+      <i th:unless="${#strings.contains(currentSort, field + ',')}"
+         class="bi bi-arrow-down-up text-muted" style="font-size:0.75rem;opacity:0.4;"></i>
+    </span>
+  </a>
+</th>

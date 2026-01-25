@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{notifications.title}">Notifications</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4" th:text="#{notifications.title}">Notification Logs</h4>
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th th:replace="~{fragments/table-tools :: sortTh('eventType', #{notifications.event_type})}">Event</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('recipientEmail', #{notifications.recipient})}">Recipient</th>
+              <th th:text="#{notifications.subject}">Subject</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('status', #{common.status})}">Status</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('createdAt', #{common.date})}">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="n : ${page.content}">
+              <td><span class="badge bg-secondary" th:text="${n.eventType}">EVENT</span></td>
+              <td th:text="${n.recipientEmail ?: '-'}">email</td>
+              <td th:text="${n.subject ?: '-'}">Subject</td>
+              <td><span class="badge" th:classappend="'badge-' + ${n.status}" th:text="${n.status}">SENT</span></td>
+              <td th:text="${#temporals.format(n.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2026</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(page.content)}">
+              <td colspan="5" class="text-center text-muted py-3" th:text="#{common.no_results}">No results</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-footer" th:replace="~{fragments/pagination :: pagination(${page})}"></div>
+  </div>
+</section>
+</body>
+</html>

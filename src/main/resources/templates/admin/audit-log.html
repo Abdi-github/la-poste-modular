@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{audit.title}">Audit Log</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4"><i class="bi bi-journal-text me-2"></i><span th:text="#{audit.title}">Audit Log</span></h4>
+
+  <!-- ── Filters ─────────────────────────────── -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <form th:action="@{/admin/audit-log}" method="get" class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label" th:text="#{audit.entity_type}">Entity Type</label>
+          <select name="entityType" class="form-select">
+            <option value="" th:text="'— ' + #{notifications.compose_all} + ' —'">— All —</option>
+            <option value="Parcel" th:selected="${entityType == 'Parcel'}">Parcel</option>
+            <option value="DeliveryRoute" th:selected="${entityType == 'DeliveryRoute'}">DeliveryRoute</option>
+            <option value="Branch" th:selected="${entityType == 'Branch'}">Branch</option>
+            <option value="Employee" th:selected="${entityType == 'Employee'}">Employee</option>
+            <option value="Customer" th:selected="${entityType == 'Customer'}">Customer</option>
+            <option value="PickupRequest" th:selected="${entityType == 'PickupRequest'}">PickupRequest</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" th:text="#{audit.action}">Action</label>
+          <select name="action" class="form-select">
+            <option value="" th:text="'— ' + #{notifications.compose_all} + ' —'">— All —</option>
+            <option value="CREATE" th:selected="${action == 'CREATE'}">CREATE</option>
+            <option value="UPDATE" th:selected="${action == 'UPDATE'}">UPDATE</option>
+            <option value="DELETE" th:selected="${action == 'DELETE'}">DELETE</option>
+            <option value="STATUS_CHANGE" th:selected="${action == 'STATUS_CHANGE'}">STATUS_CHANGE</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-funnel me-1"></i><span th:text="#{common.search}">Search</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Table ───────────────────────────────── -->
+  <div class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+        <tr>
+          <th th:text="#{common.date}">Date</th>
+          <th th:text="#{audit.entity_type}">Entity Type</th>
+          <th>ID</th>
+          <th th:text="#{audit.action}">Action</th>
+          <th th:text="#{audit.performed_by}">Performed By</th>
+          <th th:text="#{common.details}">Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${page.content}">
+          <td class="text-nowrap"><small th:text="${#temporals.format(entry.createdAt, 'dd.MM.yyyy HH:mm:ss')}">—</small></td>
+          <td><span class="badge bg-secondary" th:text="${entry.entityType}">—</span></td>
+          <td th:text="${entry.entityId}">—</td>
+          <td>
+            <span class="badge"
+                  th:classappend="${entry.action == 'CREATE' ? 'bg-success' : entry.action == 'DELETE' ? 'bg-danger' : entry.action == 'UPDATE' ? 'bg-info' : 'bg-warning'}"
+                  th:text="${entry.action}">—</span>
+          </td>
+          <td th:text="${entry.performedBy}">—</td>
+          <td><small class="text-muted" th:text="${#strings.abbreviate(entry.details ?: '', 80)}">—</small></td>
+        </tr>
+        <tr th:if="${page.content.isEmpty()}">
+          <td colspan="6" class="text-center text-muted py-4" th:text="#{common.no_results}">No results found</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination -->
+    <div class="card-footer" th:if="${page.totalPages > 1}">
+      <div th:replace="~{fragments/pagination :: pagination(${page})}"></div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

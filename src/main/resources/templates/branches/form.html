@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="${editMode} ? #{branches.edit} : #{branches.new}">Branch Form</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4" th:text="${editMode} ? #{branches.edit} : #{branches.new}">Branch</h4>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form th:action="${editMode} ? @{'/branches/' + ${branch.id} + '/edit'} : @{/branches}" method="post">
+        <div class="row g-3">
+
+          <!-- Type -->
+          <div class="col-md-4">
+            <label class="form-label" th:text="#{branches.type}">Type</label>
+            <select name="type" class="form-select" required>
+              <option th:each="t : ${types}" th:value="${t}" th:text="${t}"
+                      th:selected="${editMode and branch.type == t}"></option>
+            </select>
+          </div>
+
+          <!-- Canton -->
+          <div class="col-md-4">
+            <label class="form-label" th:text="#{branches.canton}">Canton</label>
+            <select name="canton" class="form-select">
+              <option value="">—</option>
+              <option th:each="c : ${cantons}" th:value="${c}" th:text="${c}"
+                      th:selected="${editMode and branch != null and branch.canton == c.name()}"></option>
+            </select>
+          </div>
+
+          <!-- Phone -->
+          <div class="col-md-4">
+            <label class="form-label" th:text="#{branches.phone}">Phone</label>
+            <input type="tel" name="phone" class="form-control"
+                   th:value="${editMode ? branch.phone : ''}"/>
+          </div>
+
+          <!-- Street -->
+          <div class="col-md-6">
+            <label class="form-label" th:text="#{branches.street}">Street</label>
+            <input type="text" name="street" class="form-control" required
+                   th:value="${editMode ? branch.street : ''}"/>
+          </div>
+
+          <!-- ZIP -->
+          <div class="col-md-2">
+            <label class="form-label" th:text="#{branches.zip}">ZIP</label>
+            <input type="text" name="zipCode" class="form-control" required maxlength="10"
+                   th:value="${editMode ? branch.zipCode : ''}"/>
+          </div>
+
+          <!-- City -->
+          <div class="col-md-4">
+            <label class="form-label" th:text="#{branches.city}">City</label>
+            <input type="text" name="city" class="form-control" required
+                   th:value="${editMode ? branch.city : ''}"/>
+          </div>
+
+          <!-- Email -->
+          <div class="col-md-6">
+            <label class="form-label" th:text="#{branches.email}">Email</label>
+            <input type="email" name="email" class="form-control"
+                   th:value="${editMode ? branch.email : ''}"/>
+          </div>
+
+          <!-- Coordinates -->
+          <div class="col-md-3">
+            <label class="form-label">Latitude</label>
+            <input type="number" name="latitude" class="form-control" step="0.000001"
+                   th:value="${editMode ? branch.latitude : ''}"/>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Longitude</label>
+            <input type="number" name="longitude" class="form-control" step="0.000001"
+                   th:value="${editMode ? branch.longitude : ''}"/>
+          </div>
+        </div>
+
+        <!-- ── Translated Names (per locale) ──── -->
+        <h6 class="mt-4 mb-3"><i class="bi bi-translate me-2"></i><span th:text="#{branches.name}">Name</span> <small class="text-muted">(multilingual)</small></h6>
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">🇩🇪 Deutsch</label>
+            <input type="text" name="nameDe" class="form-control" required
+                   th:value="${editMode ? branch.name : ''}" placeholder="Postfiliale Zürich"/>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">🇫🇷 Français</label>
+            <input type="text" name="nameFr" class="form-control"
+                   placeholder="Bureau de poste Zurich"/>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">🇮🇹 Italiano</label>
+            <input type="text" name="nameIt" class="form-control"
+                   placeholder="Ufficio postale Zurigo"/>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">🇬🇧 English</label>
+            <input type="text" name="nameEn" class="form-control"
+                   placeholder="Post Office Zurich"/>
+          </div>
+        </div>
+
+        <!-- ── Translated Descriptions ──── -->
+        <h6 class="mt-4 mb-3"><i class="bi bi-card-text me-2"></i><span th:text="#{common.details}">Description</span> <small class="text-muted">(multilingual, optional)</small></h6>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">🇩🇪 Deutsch</label>
+            <textarea name="descDe" class="form-control" rows="2" th:text="${editMode ? branch.description : ''}"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">🇫🇷 Français</label>
+            <textarea name="descFr" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">🇮🇹 Italiano</label>
+            <textarea name="descIt" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">🇬🇧 English</label>
+            <textarea name="descEn" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i><span th:text="${editMode} ? #{common.save} : #{common.create}">Save</span>
+          </button>
+          <a th:href="@{/branches}" class="btn btn-outline-secondary" th:text="#{common.cancel}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

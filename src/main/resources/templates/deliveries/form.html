@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{deliveries.new}">New Route</title></head>
+<body>
+<section layout:fragment="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0" th:text="#{deliveries.new}">New Route</h4>
+    <a th:href="@{/deliveries}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><span th:text="#{common.back}">Back</span></a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form th:action="@{/deliveries}" method="post">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="branchId" class="form-label" th:text="#{employees.branch}">Branch</label>
+            <select class="form-select" id="branchId" name="branchId" required>
+              <option value="">—</option>
+              <option th:each="b : ${branches}" th:value="${b.id}" th:text="${b.branchCode + ' – ' + b.name}">Branch</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="assignedEmployeeId" class="form-label" th:text="#{deliveries.courier}">Courier</label>
+            <select class="form-select" id="assignedEmployeeId" name="assignedEmployeeId">
+              <option value="">—</option>
+              <option th:each="e : ${employees}" th:value="${e.id}" th:text="${e.employeeNumber + ' – ' + e.firstName + ' ' + e.lastName}">Employee</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="date" class="form-label" th:text="#{common.date}">Date</label>
+            <input type="date" class="form-control" id="date" name="date" required/>
+          </div>
+          <div class="col-12">
+            <label for="trackingNumbersText" class="form-label" th:text="#{deliveries.tracking_numbers}">Tracking Numbers</label>
+            <textarea class="form-control" id="trackingNumbersText" name="trackingNumbersText" rows="5"
+                      th:placeholder="#{deliveries.tracking_numbers_help}" required></textarea>
+            <div class="form-text" th:text="#{deliveries.tracking_numbers_help}">One tracking number per line</div>
+          </div>
+        </div>
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-warning btn-lg"><i class="bi bi-check-lg me-1"></i><span th:text="#{common.save}">Save</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

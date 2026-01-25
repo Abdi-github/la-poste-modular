@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{employees.detail}">Employee Details</title></head>
+<body>
+<section layout:fragment="content">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0" th:text="#{employees.detail}">Employee Details</h4>
+    <div>
+      <a th:href="@{/employees/{id}/edit(id=${employee.id})}" class="btn btn-outline-warning me-2"><i class="bi bi-pencil me-1"></i><span th:text="#{common.edit}">Edit</span></a>
+      <a th:href="@{/employees}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><span th:text="#{common.back}">Back</span></a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- ── Employee Info ── -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><code th:text="${employee.employeeNumber}">EMP-XXX</code></h6>
+          <span class="badge" th:classappend="'badge-' + ${employee.status}" th:text="${employee.status}">STATUS</span>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label text-muted small" th:text="#{employees.name}">Name</label>
+              <div th:text="${employee.firstName + ' ' + employee.lastName}">Name</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small" th:text="#{common.email}">Email</label>
+              <div th:text="${employee.email}">email@post.ch</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small" th:text="#{common.phone}">Phone</label>
+              <div th:text="${employee.phone ?: '-'}">-</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small" th:text="#{employees.role}">Role</label>
+              <div><span class="badge bg-secondary" th:text="${employee.role}">ROLE</span></div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small" th:text="#{employees.branch}">Branch</label>
+              <div>
+                <a th:if="${branchName != null}" th:href="@{/branches/{id}(id=${employee.assignedBranchId})}" th:text="${branchName}" class="text-decoration-none">Branch</a>
+                <span th:if="${branchName == null}">-</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small" th:text="#{employees.hire_date}">Hire Date</label>
+              <div th:text="${employee.hireDate}">2026-01-01</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small" th:text="#{employees.locale}">Language</label>
+              <div th:text="${employee.preferredLocale}">de</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small" th:text="#{parcels.created}">Created</label>
+              <div th:text="${employee.createdAt != null} ? ${#temporals.format(employee.createdAt, 'dd.MM.yyyy HH:mm')} : '-'">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Status Change Panel ── -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0" th:text="#{employees.status_change}">Change Status</h6>
+        </div>
+        <div class="card-body d-flex flex-column gap-2">
+          <form th:action="@{/employees/{id}/status(id=${employee.id})}" method="post" th:each="st : ${T(ch.swiftapp.laposte.user.enums.EmployeeStatus).values()}">
+            <input type="hidden" name="newStatus" th:value="${st}"/>
+            <button type="submit" class="btn w-100"
+                    th:classappend="${employee.status == st} ? 'btn-secondary disabled' : 'btn-outline-secondary'"
+                    th:disabled="${employee.status == st}"
+                    th:text="${st}">STATUS</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

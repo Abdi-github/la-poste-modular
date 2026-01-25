@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden">
+  <div style="background:#dc0018;padding:20px 24px;color:#fff;text-align:center">
+    <h1 style="margin:0;font-size:24px">🏠 La Poste Suisse</h1>
+  </div>
+  <div style="padding:24px">
+    <h2 style="color:#333" th:text="${subject}">Pickup Confirmed</h2>
+    <p>Your pickup request has been confirmed. A courier will arrive at the scheduled time.</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+      <tr><td style="padding:8px 0;color:#666;width:40%">Pickup Date</td>
+          <td style="padding:8px 0;font-weight:bold" th:text="${pickupDate}">2026-04-09</td></tr>
+      <tr><td style="padding:8px 0;color:#666">Time Window</td>
+          <td style="padding:8px 0" th:text="${timeWindow}">09:00 – 12:00</td></tr>
+      <tr><td style="padding:8px 0;color:#666">Address</td>
+          <td style="padding:8px 0" th:text="${pickupAddress}">Bahnhofstrasse 1, 8001 Zürich</td></tr>
+    </table>
+    <p>Please ensure your parcels are ready before the courier arrives.</p>
+  </div>
+  <div style="background:#f5f5f5;padding:16px 24px;text-align:center;font-size:12px;color:#999">
+    &copy; 2026 La Poste Suisse — Swiss Postal Service
+  </div>
+</div>
+</body>
+</html>
+

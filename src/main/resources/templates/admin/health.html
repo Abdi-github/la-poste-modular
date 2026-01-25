@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{health.title}">System Health</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4"><i class="bi bi-heart-pulse me-2"></i><span th:text="#{health.title}">System Health</span></h4>
+
+  <!-- ── Overall Status ──────────────────────── -->
+  <div class="alert mb-4"
+       th:classappend="${overallStatus == 'UP' ? 'alert-success' : 'alert-danger'}">
+    <h5 class="mb-0">
+      <i th:class="${overallStatus == 'UP' ? 'bi bi-check-circle-fill' : 'bi bi-x-circle-fill'}" class="me-2"></i>
+      <span th:text="#{health.overall}">Overall Status</span>:
+      <strong th:text="${overallStatus}">UP</strong>
+    </h5>
+  </div>
+
+  <div class="row g-4">
+    <!-- ── Component Health Cards ────────────── -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header"><h6 class="mb-0" th:text="#{health.components}">Components</h6></div>
+        <div class="card-body p-0">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr>
+              <th th:text="#{health.component}">Component</th>
+              <th th:text="#{common.status}">Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="entry : ${components}">
+              <td>
+                <i class="bi me-1"
+                   th:classappend="${entry.value == 'UP' ? 'bi-check-circle text-success' : 'bi-x-circle text-danger'}"></i>
+                <span th:text="${#strings.capitalize(entry.key)}">db</span>
+              </td>
+              <td>
+                <span class="badge" th:classappend="${entry.value == 'UP' ? 'bg-success' : 'bg-danger'}"
+                      th:text="${entry.value}">UP</span>
+              </td>
+            </tr>
+            <tr th:if="${components.isEmpty()}">
+              <td colspan="2" class="text-muted text-center">No components available</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── JVM / System Info ────────────────── -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header"><h6 class="mb-0" th:text="#{health.system_info}">System Info</h6></div>
+        <div class="card-body">
+          <table class="table table-borderless mb-0">
+            <tr th:if="${appName}">
+              <th class="text-muted" style="width:40%;" th:text="#{health.app_name}">Application</th>
+              <td th:text="${appName}">—</td>
+            </tr>
+            <tr th:if="${appVersion}">
+              <th class="text-muted" th:text="#{health.version}">Version</th>
+              <td th:text="${appVersion}">—</td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{health.uptime}">Uptime</th>
+              <td th:text="${uptime}">—</td>
+            </tr>
+            <tr>
+              <th class="text-muted">Java</th>
+              <td th:text="${javaVersion + ' (' + javaVendor + ')'}">—</td>
+            </tr>
+            <tr>
+              <th class="text-muted">OS</th>
+              <td th:text="${osName + ' ' + osArch}">—</td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{health.processors}">Processors</th>
+              <td th:text="${availableProcessors}">—</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Memory Card ──────────────────────── -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header"><h6 class="mb-0" th:text="#{health.memory}">JVM Memory</h6></div>
+        <div class="card-body">
+          <div class="mb-3">
+            <div class="d-flex justify-content-between small mb-1">
+              <span th:text="#{health.used}">Used</span>
+              <span th:text="${usedMemoryMB + ' / ' + maxMemoryMB + ' MB'}">—</span>
+            </div>
+            <div class="progress" style="height: 20px;">
+              <div class="progress-bar"
+                   th:classappend="${(usedMemoryMB * 100 / maxMemoryMB) > 80 ? 'bg-danger' : (usedMemoryMB * 100 / maxMemoryMB) > 60 ? 'bg-warning' : 'bg-success'}"
+                   role="progressbar"
+                   th:style="'width:' + ${usedMemoryMB * 100 / maxMemoryMB} + '%'"
+                   th:text="${usedMemoryMB + ' MB'}">—</div>
+            </div>
+          </div>
+          <table class="table table-borderless table-sm mb-0">
+            <tr>
+              <td class="text-muted" th:text="#{health.max_memory}">Max</td>
+              <td th:text="${maxMemoryMB + ' MB'}">—</td>
+            </tr>
+            <tr>
+              <td class="text-muted" th:text="#{health.allocated}">Allocated</td>
+              <td th:text="${totalMemoryMB + ' MB'}">—</td>
+            </tr>
+            <tr>
+              <td class="text-muted" th:text="#{health.free}">Free</td>
+              <td th:text="${freeMemoryMB + ' MB'}">—</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

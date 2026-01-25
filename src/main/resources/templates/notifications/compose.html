@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{notifications.compose}">Compose Notification</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4"><i class="bi bi-pencil-square me-2"></i><span th:text="#{notifications.compose}">Compose Notification</span></h4>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body">
+          <form th:action="@{/notifications/compose}" method="post">
+
+            <!-- Title -->
+            <div class="mb-3">
+              <label for="title" class="form-label fw-bold" th:text="#{notifications.compose_title}">Title</label>
+              <input type="text" id="title" name="title" class="form-control" required maxlength="255"
+                     th:placeholder="#{notifications.compose_title_placeholder}"/>
+            </div>
+
+            <!-- Message -->
+            <div class="mb-3">
+              <label for="message" class="form-label fw-bold" th:text="#{notifications.compose_message}">Message</label>
+              <textarea id="message" name="message" class="form-control" rows="4" required
+                        th:placeholder="#{notifications.compose_message_placeholder}"></textarea>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+              <label for="category" class="form-label fw-bold" th:text="#{notifications.compose_category}">Category</label>
+              <select id="category" name="category" class="form-select">
+                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}"
+                        th:selected="${cat.name() == 'INFO'}">INFO</option>
+              </select>
+            </div>
+
+            <!-- Reference URL -->
+            <div class="mb-3">
+              <label for="referenceUrl" class="form-label" th:text="#{notifications.compose_link}">Link (optional)</label>
+              <input type="text" id="referenceUrl" name="referenceUrl" class="form-control"
+                     placeholder="/deliveries, /parcels, /dashboard"/>
+            </div>
+
+            <hr/>
+
+            <!-- ── Targeting ──────────────────────────── -->
+            <h6 class="fw-bold mb-3"><i class="bi bi-bullseye me-1"></i><span th:text="#{notifications.compose_targeting}">Targeting</span></h6>
+            <p class="small text-muted" th:text="#{notifications.compose_targeting_help}">
+              Leave all fields empty to broadcast to all employees. Set specific fields to narrow the audience.
+            </p>
+
+            <div class="row g-3 mb-3">
+              <!-- Target Employee (individual) -->
+              <div class="col-md-4">
+                <label for="targetEmployeeId" class="form-label" th:text="#{notifications.compose_individual}">Individual Employee</label>
+                <select id="targetEmployeeId" name="targetEmployeeId" class="form-select">
+                  <option value="" th:text="#{notifications.compose_all}">— All —</option>
+                  <option th:each="emp : ${employees}" th:value="${emp.id}"
+                          th:text="${emp.firstName + ' ' + emp.lastName + ' (' + emp.employeeNumber + ')'}">Employee</option>
+                </select>
+              </div>
+
+              <!-- Target Role -->
+              <div class="col-md-4">
+                <label for="targetRole" class="form-label" th:text="#{notifications.compose_role}">Role</label>
+                <select id="targetRole" name="targetRole" class="form-select">
+                  <option value="" th:text="#{notifications.compose_all}">— All Roles —</option>
+                  <option th:each="role : ${roles}" th:value="${role}" th:text="${role}">ADMIN</option>
+                </select>
+              </div>
+
+              <!-- Target Branch -->
+              <div class="col-md-4">
+                <label for="targetBranchId" class="form-label" th:text="#{notifications.compose_branch}">Branch</label>
+                <select id="targetBranchId" name="targetBranchId" class="form-select">
+                  <option value="" th:text="#{notifications.compose_all}">— All Branches —</option>
+                  <option th:each="b : ${branches}" th:value="${b.id}"
+                          th:text="${b.name + ' (' + b.branchCode + ')'}">Branch</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-warning fw-bold">
+                <i class="bi bi-send me-1"></i><span th:text="#{notifications.compose_send}">Send Notification</span>
+              </button>
+              <a th:href="@{/notifications}" class="btn btn-outline-secondary" th:text="#{common.cancel}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar help -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle me-1"></i> Targeting Guide</h6></div>
+        <div class="card-body small">
+          <p><strong>📢 Broadcast:</strong> Leave all targeting fields empty. Every employee will see the notification.</p>
+          <p><strong>👤 Individual:</strong> Select a specific employee. Only they will see it.</p>
+          <p><strong>🏷️ By Role:</strong> Select ADMIN, BRANCH_MANAGER, or EMPLOYEE. All employees with that role will see it.</p>
+          <p><strong>🏢 By Branch:</strong> Select a branch. All employees assigned to that branch will see it.</p>
+          <p><strong>🎯 Combined:</strong> Set both role and branch to target e.g. all couriers at Zürich branch.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{employees.title}">Employees</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4" th:text="#{employees.title}">Employee Management</h4>
+
+  <!-- ── Filter Bar ──────────────────────────── -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body py-2">
+      <form th:action="@{/employees}" method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small mb-1" th:text="#{common.search}">Search</label>
+          <input type="text" class="form-control form-control-sm" name="search" th:value="${search}"
+                 placeholder="Name, Email..."/>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small mb-1" th:text="#{common.status}">Status</label>
+          <select name="status" class="form-select form-select-sm">
+            <option value="" th:text="'— ' + #{notifications.compose_all} + ' —'">— All —</option>
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${s == selectedStatus}"></option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small mb-1" th:text="#{employees.role}">Role</label>
+          <select name="role" class="form-select form-select-sm">
+            <option value="" th:text="'— ' + #{notifications.compose_all} + ' —'">— All —</option>
+            <option th:each="r : ${allRoles}" th:value="${r}" th:text="${r}" th:selected="${r == selectedRole}"></option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small mb-1" th:text="#{employees.branch}">Branch</label>
+          <select name="branchId" class="form-select form-select-sm">
+            <option value="" th:text="'— ' + #{notifications.compose_all} + ' —'">— All —</option>
+            <option th:each="b : ${allBranches}" th:value="${b.id}" th:text="${b.name}"
+                    th:selected="${b.id == selectedBranchId}"></option>
+          </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-funnel me-1"></i><span th:text="#{common.search}">Filter</span>
+          </button>
+          <a th:href="@{/employees}" class="btn btn-outline-secondary btn-sm" title="Reset">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Table ───────────────────────────────── -->
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th th:replace="~{fragments/table-tools :: sortTh('employeeNumber', #{employees.number})}">No.</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('firstName', #{employees.name})}">Name</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('email', 'Email')}">Email</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('role', #{employees.role})}">Role</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('status', #{common.status})}">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="e : ${page.content}">
+              <td><code th:text="${e.employeeNumber}">EMP-XXX</code></td>
+              <td th:text="${e.firstName + ' ' + e.lastName}">Name</td>
+              <td th:text="${e.email}">email@post.ch</td>
+              <td><span class="badge bg-secondary" th:text="${e.role}">COURIER</span></td>
+              <td><span class="badge" th:classappend="'badge-' + ${e.status}" th:text="${e.status}">ACTIVE</span></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(page.content)}">
+              <td colspan="5" class="text-center text-muted py-3" th:text="#{common.no_results}">No results</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-footer" th:replace="~{fragments/pagination :: pagination(${page})}"></div>
+  </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{branches.title}">Branches</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4" th:text="#{branches.title}">Branch Management</h4>
+
+  <!-- ── Filter Bar ──────────────────────────── -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body py-2">
+      <form th:action="@{/branches}" method="get" class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small mb-1" th:text="#{common.search}">Search</label>
+          <input type="text" class="form-control form-control-sm" name="search" th:value="${search}"
+                 th:placeholder="#{branches.code} + ', ' + #{branches.city} + '...'"/>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small mb-1" th:text="#{branches.type}">Type</label>
+          <select name="type" class="form-select form-select-sm">
+            <option value="" th:text="'— ' + #{notifications.compose_all} + ' —'">— All —</option>
+            <option th:each="t : ${types}" th:value="${t}" th:text="${t}" th:selected="${t == selectedType}"></option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small mb-1" th:text="#{branches.canton}">Canton</label>
+          <select name="canton" class="form-select form-select-sm">
+            <option value="" th:text="'— ' + #{notifications.compose_all} + ' —'">— All —</option>
+            <option th:each="c : ${cantons}" th:value="${c}" th:text="${c}" th:selected="${#strings.toString(c) == selectedCanton}"></option>
+          </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-funnel me-1"></i><span th:text="#{common.search}">Filter</span>
+          </button>
+          <a th:href="@{/branches}" class="btn btn-outline-secondary btn-sm" title="Reset">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Table ───────────────────────────────── -->
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th th:replace="~{fragments/table-tools :: sortTh('branchCode', #{branches.code})}">Code</th>
+              <th th:text="#{branches.name}">Name</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('type', #{branches.type})}">Type</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('status', #{common.status})}">Status</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('city', #{branches.city})}">City</th>
+              <th th:replace="~{fragments/table-tools :: sortTh('canton', #{branches.canton})}">Canton</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="b : ${page.content}">
+              <td><code th:text="${b.branchCode}">BR-XXX</code></td>
+              <td th:text="${b.name}">Branch Name</td>
+              <td><span class="badge bg-secondary" th:text="${b.type}">BRANCH</span></td>
+              <td><span class="badge" th:classappend="'badge-' + ${b.status}" th:text="${b.status}">ACTIVE</span></td>
+              <td th:text="${b.city}">City</td>
+              <td th:text="${b.canton}">ZH</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(page.content)}">
+              <td colspan="6" class="text-center text-muted py-3" th:text="#{common.no_results}">No results</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-footer" th:replace="~{fragments/pagination :: pagination(${page})}"></div>
+  </div>
+</section>
+</body>
+</html>

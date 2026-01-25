@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{addresses.title}">Addresses</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4" th:text="#{addresses.title}">Address Registry</h4>
+
+  <!-- ── Search Form ──────────────────────────────── -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form th:action="@{/addresses}" method="get" class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label" th:text="#{addresses.zip}">ZIP Code</label>
+          <input type="text" class="form-control" name="zipCode" th:value="${param.zipCode}" placeholder="e.g. 8001"/>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" th:text="#{addresses.city}">City</label>
+          <input type="text" class="form-control" name="city" th:value="${param.city}" placeholder="e.g. Zürich"/>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" th:text="#{addresses.canton}">Canton</label>
+          <select class="form-select" name="canton">
+            <option value="" th:text="'— ' + #{common.search} + ' —'">— Select —</option>
+            <option th:each="c : ${cantons}" th:value="${c}" th:text="${c}"
+                    th:selected="${param.canton != null and #strings.toString(c) == param.canton}">ZH</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-search me-1"></i><span th:text="#{common.search}">Search</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Results Table ────────────────────────────── -->
+  <div class="card">
+    <div class="card-header" th:if="${searchType != null}">
+      <small class="text-muted">
+        <span th:text="${#lists.size(addresses)}">0</span>
+        <span th:text="#{common.results_for}">results for</span>
+        <strong th:text="${searchValue}">value</strong>
+      </small>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th th:text="#{addresses.zip}">ZIP</th>
+              <th th:text="#{addresses.city}">City</th>
+              <th th:text="#{addresses.canton}">Canton</th>
+              <th th:text="#{addresses.municipality}">Municipality</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="a : ${addresses}">
+              <td><code th:text="${a.zipCode}">8001</code></td>
+              <td th:text="${a.city}">Zürich</td>
+              <td><span class="badge bg-secondary" th:text="${a.canton}">ZH</span></td>
+              <td th:text="${a.municipality ?: '-'}">Zürich</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(addresses)}">
+              <td colspan="4" class="text-center text-muted py-3">
+                <span th:if="${searchType == null}" th:text="#{addresses.search_hint}">Use the search form above to find addresses</span>
+                <span th:if="${searchType != null}" th:text="#{common.no_results}">No results found</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+

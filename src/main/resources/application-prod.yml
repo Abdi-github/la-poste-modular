@@ -1,0 +1,25 @@
+# ── Production Profile Overrides ──────────────────
+spring:
+  thymeleaf:
+    cache: true
+  jpa:
+    show-sql: false
+
+server:
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    ch.swiftapp.laposte: INFO
+    org.springframework.modulith: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+

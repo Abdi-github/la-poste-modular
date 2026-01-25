@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head><title th:text="#{profile.title}">Profile</title></head>
+<body>
+<section layout:fragment="content">
+  <h4 class="mb-4" th:text="#{profile.title}">My Profile</h4>
+
+  <div class="row g-4">
+    <!-- ── User Information Card ─────────────── -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="bi bi-person-circle me-2"></i><span th:text="#{profile.user_info}">User Information</span></h6>
+        </div>
+        <div class="card-body">
+          <table class="table table-borderless mb-0">
+            <tr>
+              <th class="text-muted" style="width:35%;" th:text="#{profile.name}">Name</th>
+              <td th:text="${displayName}">—</td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{common.email}">Email</th>
+              <td th:text="${email}">—</td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{profile.roles}">Roles</th>
+              <td><span th:each="role : ${#strings.arraySplit(roles, ', ')}" class="badge bg-primary me-1" th:text="${role}">ROLE</span></td>
+            </tr>
+            <tr th:if="${keycloakId}">
+              <th class="text-muted" th:text="#{profile.keycloak_id}">Keycloak ID</th>
+              <td><code class="small" th:text="${keycloakId}">—</code></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Employee Details Card ─────────────── -->
+    <div class="col-md-6" th:if="${employee}">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="bi bi-person-badge me-2"></i><span th:text="#{profile.employee_info}">Employee Details</span></h6>
+        </div>
+        <div class="card-body">
+          <table class="table table-borderless mb-0">
+            <tr>
+              <th class="text-muted" style="width:35%;" th:text="#{employees.number}">Employee No.</th>
+              <td th:text="${employee.employeeNumber}">—</td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{employees.role}">Role</th>
+              <td><span class="badge bg-info" th:text="${employee.role}">—</span></td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{common.status}">Status</th>
+              <td><span class="badge" th:classappend="${employee.status.name() == 'ACTIVE' ? 'bg-success' : 'bg-secondary'}" th:text="${employee.status}">—</span></td>
+            </tr>
+            <tr>
+              <th class="text-muted" th:text="#{employees.hire_date}">Hire Date</th>
+              <td th:text="${employee.hireDate}">—</td>
+            </tr>
+            <tr th:if="${employee.assignedBranchId}">
+              <th class="text-muted" th:text="#{employees.branch}">Branch</th>
+              <td th:text="'#' + ${employee.assignedBranchId}">—</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Language Preference Card ──────────── -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="bi bi-globe2 me-2"></i><span th:text="#{profile.language}">Language Preference</span></h6>
+        </div>
+        <div class="card-body">
+          <form th:action="@{/profile/language}" method="post">
+            <div class="mb-3">
+              <label for="langSelect" class="form-label" th:text="#{profile.select_language}">Select Language</label>
+              <select class="form-select" name="lang" id="langSelect">
+                <option value="de" th:selected="${#locale.language == 'de'}">🇩🇪 Deutsch</option>
+                <option value="fr" th:selected="${#locale.language == 'fr'}">🇫🇷 Français</option>
+                <option value="it" th:selected="${#locale.language == 'it'}">🇮🇹 Italiano</option>
+                <option value="en" th:selected="${#locale.language == 'en'}">🇬🇧 English</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i><span th:text="#{common.save}">Save</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
+
