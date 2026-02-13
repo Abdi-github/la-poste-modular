@@ -1,0 +1,176 @@
+# ──────────────────────────────────────────────────────────
+# La Poste Modular — Development Docker Compose
+# ──────────────────────────────────────────────────────────
+# Usage:
+#   make dev                         # Start all services
+#   make dev-infra                   # Start infra only (run app on host)
+#   make down                        # Stop all
+#   docker compose down -v           # Stop + destroy volumes (reset DB)
+# ──────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL 17 ───────────────────────────────────────
+  postgres:
+    image: postgres:17
+    container_name: laposte-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-laposte_modular}
+      POSTGRES_USER: ${POSTGRES_USER:-laposte_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-laposte_secret}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-laposte_admin} -d ${POSTGRES_DB:-laposte_modular}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # ── Redis 7 (Caching) ──────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: laposte-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ── pgAdmin 4 ──────────────────────────────────────────
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: laposte-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@swiftapp.ch}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_LISTEN_PORT: 5050
+    ports:
+      - "5050:5050"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+      - ./docker/pgadmin/pgpass:/pgadmin4/pgpass:ro
+    restart: unless-stopped
+
+  # ── Mailpit (Local Email Testing) ──────────────────────
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: laposte-mailpit
+    ports:
+      - "1028:1025"
+      - "8028:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+      MP_MAX_MESSAGES: 500
+      MP_DATABASE: /data/mailpit.db
+    volumes:
+      - mailpit_data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8025/api/v1/info"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+  # ── Keycloak (Identity Provider) ────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.4
+    container_name: laposte-keycloak
+    entrypoint: ["/bin/bash", "/opt/keycloak/scripts/entrypoint.sh"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-laposte_modular}
+      KC_DB_USERNAME: ${POSTGRES_USER:-laposte_admin}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-laposte_secret}
+      KC_HTTPS_PORT: 8443
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_PORT: 8080
+      # Fixed hostname — HTTPS URL the browser uses to reach Keycloak.
+      KC_HOSTNAME: https://localhost:8071
+      KC_HEALTH_ENABLED: "true"
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+    ports:
+      - "8071:8443"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "cat < /dev/null > /dev/tcp/127.0.0.1/9000 && exit 0 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./docker/keycloak/entrypoint.sh:/opt/keycloak/scripts/entrypoint.sh:ro
+      - ./docker/keycloak/provision.sh:/opt/keycloak/scripts/provision.sh:ro
+    restart: unless-stopped
+
+  # ── Spring Boot App (Dev with Hot-Reload) ──────────────
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile.dev
+    container_name: laposte-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src
+      - ./pom.xml:/app/pom.xml:ro
+      - maven_cache:/root/.m2
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-laposte_modular}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-laposte_admin}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-laposte_secret}
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: 1025
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      SPRING_THYMELEAF_CACHE: "false"
+      # App base URL — used in OAuth2 redirect_uri (avoids 0.0.0.0 inside Docker)
+      APP_BASE_URL: http://localhost:8080
+      # Keycloak — split URLs for Docker networking
+      KEYCLOAK_EXTERNAL_URI: https://localhost:8071/realms/la-poste
+      KEYCLOAK_INTERNAL_URI: http://keycloak:8080/realms/la-poste
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-la-poste}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+    driver: local
+  redis_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  mailpit_data:
+    driver: local
+  maven_cache:
+    driver: local
+  keycloak_data:
+    driver: local
+

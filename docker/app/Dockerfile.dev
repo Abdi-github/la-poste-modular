@@ -1,0 +1,33 @@
+# ──────────────────────────────────────────────────────────
+# La Poste Modular — Development Dockerfile (Hot-Reload)
+# ──────────────────────────────────────────────────────────
+FROM eclipse-temurin:21-jdk
+
+LABEL maintainer="La Poste Modular <dev@swiftapp.ch>"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl tzdata \
+    && ln -sf /usr/share/zoneinfo/Europe/Zurich /etc/localtime \
+    && echo "Europe/Zurich" > /etc/timezone \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+RUN chmod +x mvnw && ./mvnw dependency:go-offline -B -q
+
+EXPOSE 8080
+
+ENV MAVEN_OPTS="-XX:+UseContainerSupport \
+    -XX:MaxRAMPercentage=75.0 \
+    -Dspring.devtools.restart.enabled=true \
+    -Dspring.devtools.livereload.enabled=true \
+    -Duser.timezone=Europe/Zurich"
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
+    CMD curl -sf http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["./mvnw", "spring-boot:run", \
+    "-Dspring-boot.run.jvmArguments=-Dspring.devtools.restart.enabled=true -Dspring.devtools.restart.poll-interval=2s -Dspring.devtools.restart.quiet-period=1s"]
+

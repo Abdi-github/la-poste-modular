@@ -1,0 +1,144 @@
+# ──────────────────────────────────────────────────────────
+# La Poste Modular — Production Docker Compose
+# ──────────────────────────────────────────────────────────
+# Usage:
+#   make prod-up      # docker compose -f compose.prod.yaml --env-file .env.prod up -d --build
+#   make prod-down    # docker compose -f compose.prod.yaml --env-file .env.prod down
+# ──────────────────────────────────────────────────────────
+
+services:
+
+  # ── Spring Boot Application ─────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    container_name: laposte-app
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-laposte_modular}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-laposte_admin}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_MAIL_HOST: ${MAIL_HOST}
+      SPRING_MAIL_PORT: ${MAIL_PORT:-587}
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME:-}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_THYMELEAF_CACHE: "true"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics
+      LOGGING_LEVEL_CH_SWIFTAPP_LAPOSTE: INFO
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      # Keycloak
+      KEYCLOAK_EXTERNAL_URI: ${KEYCLOAK_EXTERNAL_URI}
+      KEYCLOAK_INTERNAL_URI: ${KEYCLOAK_INTERNAL_URI}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      # App base URL — used in OAuth2 redirect_uri
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
+      - frontend
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1536M
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+    restart: unless-stopped
+
+  # ── PostgreSQL 17 (Alpine) ──────────────────────────────
+  postgres:
+    image: postgres:17-alpine
+    container_name: laposte-db-prod
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-laposte_modular}
+      POSTGRES_USER: ${POSTGRES_USER:-laposte_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-laposte_admin} -d ${POSTGRES_DB:-laposte_modular}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+    restart: unless-stopped
+
+  # ── Redis 7 (Alpine) ───────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: laposte-redis-prod
+    volumes:
+      - redis_prod:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    restart: unless-stopped
+
+  # ── Nginx Reverse Proxy ─────────────────────────────────
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    container_name: laposte-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - frontend
+    volumes:
+      - nginx_logs:/var/log/nginx
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    restart: unless-stopped
+
+networks:
+  backend:
+    driver: bridge
+    name: laposte-backend
+  frontend:
+    driver: bridge
+    name: laposte-frontend
+
+volumes:
+  pgdata_prod:
+    driver: local
+    name: laposte-pgdata-prod
+  redis_prod:
+    driver: local
+    name: laposte-redis-prod
+  nginx_logs:
+    driver: local
+    name: laposte-nginx-logs
+
