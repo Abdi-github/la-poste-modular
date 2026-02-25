@@ -1,0 +1,10 @@
+I have logged in to the dashboard with admin credentials using keycloak, all the main layouts like sidebar nav items and top nav is showing but the problem is that the main content have an issue displaying the error "An unexpected error occurred. Please try again.
+⚠️
+Internal Server Error
+Something went wrong on our side. Please try again later.
+
+An unexpected error occurred. Please try again.
+
+ ", on the routes "http://localhost:8080/dashboard", "http://localhost:8080/parcels", "http://localhost:8080/branches", "http://localhost:8080/employees", "http://localhost:8080/customers", and "http://localhost:8080/deliveries". The other issue is that eventhough you said you implemented pagination, filter, and sorting functionality for all sortable fields of all datatables, there is non in the dashboard.
+
+I have an idea, why don't you check everything works which are implemented on our backend by interacting with the dashboard like human or like myself could interact using playwright MCP server which is configured in #file:.mcp.json file. But first confirm me if the playwright mcp server is available and ready for you to proceed. *** NOTE *** 1- YOU SHOULD PERFORM ALL OPERTATIONS WITH SAMPLE DATA WHERE NEEDED FOR ALL USER TYPES (ROLES) RBAC, CRUD, ETC.... FOR EACH AND EVERY SCENARIO, AND VERIFY THEY ARE WORKING AS PER INTENDED AND I SHOULD SEE WHAT BROWSER YOU ACTUALLY OPENED AND WHAT ACTIONS YOU TRY TO ACCOMPLISH. 2- CREATE A FOLDER NAMED BROWSER-AUTOMATION, AND INSIDE THIS FOLDER CREATE MD FILES FOR EACH FEATURE AND CASE YOU PERFORMED WHICH CONSISTS A COMPREHENSIVE, GRAPHICAL ILLUSTIOATIONS WHER NEEDED, BEGINNER FRIENDLY DOCUMENTAION FOR EACH SCENARIO YOU CHECKED. AS I SAID FIRST LET ME KNOW IF THE PLAYWIGHT MCP SERVER IS READY FOR YOU, AND ALSO IF I NEED TO CONFIGURE EXTERNAL SERVICES AND PACKAGES AND GET CREDENTIALS BY MY SELF BEFORE WE START EMPLEMENTING PLAYWRIGHT MCP OPERTATION. HOW SHOULD YOU LIKE TO PROCEED AND WHAT IS YOUR PLAN?

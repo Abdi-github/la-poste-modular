@@ -1,0 +1,52 @@
+User 1
+role - ADMIN,
+username - admin-laposte,
+password - pass123
+
+User 2
+role - BRANCH_MANAGER,
+username - manager1-laposte,
+password - pass123
+
+User 3
+role - BRANCH_MANAGER,
+username - manager2-laposte,
+password - pass123
+
+User 4
+role - BRANCH_MANAGER,
+username - manager3-laposte,
+password - pass123
+
+User 5
+role - EMPLOYEE,
+username - emp1-laposte,
+password - pass123
+
+User 6
+role - EMPLOYEE,
+username - emp2-laposte,
+password - pass123
+
+User 7
+role - EMPLOYEE,
+username - emp3-laposte,
+password - pass123
+
+User 8
+role - EMPLOYEE,
+username - emp4-laposte,
+password - pass123
+
+User 9
+role - EMPLOYEE,
+username - emp5-laposte,
+password - pass123
+
+User 10
+role - EMPLOYEE,
+username - emp6-laposte,
+password - pass123
+
+
+
