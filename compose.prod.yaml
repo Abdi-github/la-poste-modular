@@ -106,16 +106,20 @@ services:
       context: ./docker/nginx
       dockerfile: Dockerfile
     container_name: laposte-nginx
-    ports:
-      - "80:80"
-      - "443:443"
     depends_on:
       app:
         condition: service_healthy
     networks:
       - frontend
+      - traefik
     volumes:
       - nginx_logs:/var/log/nginx
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.laposte.rule=Host(`laposte.swiftapp.ch`)"
+      - "traefik.http.routers.laposte.entrypoints=websecure"
+      - "traefik.http.routers.laposte.tls.certresolver=letsencrypt"
+      - "traefik.http.services.laposte.loadbalancer.server.port=80"
     deploy:
       resources:
         limits:
@@ -130,6 +134,8 @@ networks:
   frontend:
     driver: bridge
     name: laposte-frontend
+  traefik:
+    external: true
 
 volumes:
   pgdata_prod:
