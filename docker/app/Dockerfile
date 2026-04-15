@@ -14,15 +14,7 @@ COPY src/ src/
 RUN ./mvnw package -DskipTests -B -q && mv target/*.jar target/app.jar
 
 # ════════════════════════════════════════════════════════════
-# STAGE 2 — Layers: Extract Spring Boot layered JAR
-# ════════════════════════════════════════════════════════════
-FROM eclipse-temurin:21-jdk AS layers
-WORKDIR /extract
-COPY --from=builder /build/target/app.jar app.jar
-RUN java -Djarmode=tools -jar app.jar extract --layers --destination extracted
-
-# ════════════════════════════════════════════════════════════
-# STAGE 3 — Runtime: Minimal JRE image
+# STAGE 2 — Runtime: Minimal JRE image
 # ════════════════════════════════════════════════════════════
 FROM eclipse-temurin:21-jre-alpine AS runtime
 
@@ -39,10 +31,7 @@ RUN addgroup -g 1000 -S appgroup \
 
 WORKDIR /app
 
-COPY --from=layers /extract/extracted/dependencies/ ./
-COPY --from=layers /extract/extracted/spring-boot-loader/ ./
-COPY --from=layers /extract/extracted/snapshot-dependencies/ ./
-COPY --from=layers /extract/extracted/application/ ./
+COPY --from=builder /build/target/app.jar ./app.jar
 
 RUN chown -R appuser:appgroup /app
 USER appuser:appgroup
@@ -58,5 +47,5 @@ ENV JAVA_OPTS="-XX:+UseContainerSupport \
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -sf http://127.0.0.1:8080/actuator/health || exit 1
 
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]
 
