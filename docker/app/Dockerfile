@@ -44,7 +44,7 @@ ENV JAVA_OPTS="-XX:+UseContainerSupport \
     -Djava.security.egd=file:/dev/./urandom \
     -Duser.timezone=Europe/Zurich"
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
     CMD curl -sf http://127.0.0.1:8080/actuator/health || exit 1
 
 ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]
