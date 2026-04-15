@@ -14,6 +14,9 @@ services:
       context: .
       dockerfile: docker/app/Dockerfile
     container_name: laposte-app
+    labels:
+      - "sablier.enable=true"
+      - "sablier.group=laposte"
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-laposte_modular}
@@ -45,6 +48,12 @@ services:
     networks:
       - backend
       - frontend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
     deploy:
       resources:
         limits:
@@ -59,6 +68,9 @@ services:
   postgres:
     image: postgres:17-alpine
     container_name: laposte-db-prod
+    labels:
+      - "sablier.enable=true"
+      - "sablier.group=laposte"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-laposte_modular}
       POSTGRES_USER: ${POSTGRES_USER:-laposte_admin}
@@ -84,6 +96,9 @@ services:
   redis:
     image: redis:7-alpine
     container_name: laposte-redis-prod
+    labels:
+      - "sablier.enable=true"
+      - "sablier.group=laposte"
     volumes:
       - redis_prod:/data
     healthcheck:
@@ -116,10 +131,14 @@ services:
       - nginx_logs:/var/log/nginx
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.allownonrunning=true"
       - "traefik.http.routers.laposte.rule=Host(`laposte.swiftapp.ch`)"
       - "traefik.http.routers.laposte.entrypoints=websecure"
       - "traefik.http.routers.laposte.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.laposte.middlewares=sablier-laposte@file"
       - "traefik.http.services.laposte.loadbalancer.server.port=80"
+      - "sablier.enable=true"
+      - "sablier.group=laposte"
     deploy:
       resources:
         limits:
