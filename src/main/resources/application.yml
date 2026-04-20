@@ -52,12 +52,13 @@ spring:
             redirect-uri: ${APP_BASE_URL:http://localhost:8080}/login/oauth2/code/keycloak
         provider:
           keycloak:
+            # NOTE: issuer-uri intentionally omitted — all URIs are explicit below.
+            # Having issuer-uri triggers OIDC discovery at startup (~18s delay).
             # Browser navigates here → must be reachable from host
             authorization-uri: ${KEYCLOAK_EXTERNAL_URI}/protocol/openid-connect/auth
             end-session-uri: ${KEYCLOAK_EXTERNAL_URI}/protocol/openid-connect/logout
             # App backend calls these → must be reachable from app process
             token-uri: ${KEYCLOAK_INTERNAL_URI}/protocol/openid-connect/token
-            user-info-uri: ${KEYCLOAK_INTERNAL_URI}/protocol/openid-connect/userinfo
             jwk-set-uri: ${KEYCLOAK_INTERNAL_URI}/protocol/openid-connect/certs
             user-name-attribute: preferred_username
 

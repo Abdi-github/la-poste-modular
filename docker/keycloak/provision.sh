@@ -43,7 +43,7 @@ done
 
 # ── Client ──
 echo "🔑 Ensuring client '$CLIENT_ID'..."
-CLIENT_UUID=$($KCADM get clients -r $REALM -q clientId=$CLIENT_ID --fields id 2>/dev/null | grep '"id"' | head -1 | sed 's/.*: "\(.*\)".*/\1/')
+CLIENT_UUID=$($KCADM get clients -r $REALM -q clientId=$CLIENT_ID --fields id 2>/dev/null | grep '"id"' | head -1 | sed 's/.*: "\(.*\)".*/\1/' || true)
 if [ -z "$CLIENT_UUID" ]; then
     $KCADM create clients -r $REALM \
         -s clientId=$CLIENT_ID \
@@ -54,7 +54,7 @@ if [ -z "$CLIENT_UUID" ]; then
         -s 'webOrigins=["http://localhost:8080"]' \
         -s directAccessGrantsEnabled=true \
         -s standardFlowEnabled=true
-    CLIENT_UUID=$($KCADM get clients -r $REALM -q clientId=$CLIENT_ID --fields id 2>/dev/null | grep '"id"' | head -1 | sed 's/.*: "\(.*\)".*/\1/')
+    CLIENT_UUID=$($KCADM get clients -r $REALM -q clientId=$CLIENT_ID --fields id 2>/dev/null | grep '"id"' | head -1 | sed 's/.*: "\(.*\)".*/\1/' || true)
     echo "   Created client: $CLIENT_ID (UUID: $CLIENT_UUID)"
 else
     echo "   Client exists: $CLIENT_ID (UUID: $CLIENT_UUID)"
